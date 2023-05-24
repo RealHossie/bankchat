@@ -1,4 +1,4 @@
-# bankchat
+# bankchat for 程娜
 
 1. git clone https://github.com/RealHossie/bankchat.git
 2. pip install -r requirement.txt
