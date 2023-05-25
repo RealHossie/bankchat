@@ -20,16 +20,19 @@ knowledge_base = st.text_area("请输入你的知识库:")
 
 question = st.text_input("请输入你的问题:")
 
-# global list to hold the conversation history
-conversation = [{"role": "system", "content": knowledge_base}]
+# Initialize the session state
+if 'conversation_history' not in st.session_state:
+    st.session_state['conversation_history'] = ''
 
 if st.button('提交'):
-    # Append user's question to conversation
-    conversation.append({"role": "user", "content": question})
+    # Append user's question to conversation history
+    st.session_state['conversation_history'] += '你: ' + question + '\n'
 
-    # If there are more than 3 exchanges (6 messages), only keep the most recent ones
-    if len(conversation) > 6:
-        conversation = conversation[-6:]
+    # Define conversation for the chat model
+    conversation = [
+        {"role": "system", "content": knowledge_base},
+        {"role": "user", "content": question}
+    ]
 
     # Call the OpenAI API
     response = openai.ChatCompletion.create(
@@ -42,7 +45,8 @@ if st.button('提交'):
     # Extract the answer
     answer = response['choices'][0]['message']['content']
 
-    # Append assistant's answer to conversation
-    conversation.append({"role": "assistant", "content": answer})
+    # Append assistant's answer to conversation history
+    st.session_state['conversation_history'] += 'AI客服: ' + answer + '\n'
 
-    st.write('AI客服:', answer)
+    # Display the conversation history
+    st.text_area("聊天历史", st.session_state['conversation_history'], height=1000)
